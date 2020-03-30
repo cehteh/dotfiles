@@ -138,6 +138,13 @@ EXAMPLES USAGE
     dotfiles status
     dotfiles diff
 
+EXAMPLE UPGRADE FROM UPSTREAM
+
+  Updates dotfiles from the upstream/orignal repository
+    dotfiles remote add upstream git://git.pipapo.org/dotfiles
+    echo 'DOTFILES_UPGRADE="upstream/master"' >>.dotfilesrc
+    dotfiles upgrade
+
 EOF
     fi
     ;;
