@@ -175,7 +175,7 @@ stored: ${files[*]}"
 upgrade) # upgrade dotfiles itself
     git remote update
     if [[ ! "$(dotfiles ls-files -m "$DOTFILES")" && "$DOTFILES_UPDATE" ]]; then
-        git checkout "$DOTFILES_UPDATE" -- "$DOTFILES" 2>/dev/null
+        git checkout "$DOTFILES_UPGRADE" -- "$DOTFILES" 2>/dev/null
         if [[ "$(dotfiles ls-files -m "$DOTFILES")" ]]; then
             git add -- "$DOTFILES"
             git commit -m "update $DOTFILES"
