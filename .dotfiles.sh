@@ -2,33 +2,36 @@
 
 test -f "$HOME/.dotfilesrc" && source "$HOME/.dotfilesrc"
 
-DOTFILES="$(realpath "$0")"
-
 export GIT_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 export DOTFILES_BRANCH="${DOTFILES_BRANCH:-$(whoami)@$(hostname)}"
 
-if test ! -d "$GIT_DIR"; then
-    case "$1" in
-    install) # install a 'dotfiles' symlink to this script in $2 or /usr/local/bin
-        ln -s "$DOTFILES" "${2:-/usr/local/bin}/dotfiles"
-        chmod +x "${2:-/usr/local/bin}/dotfiles"
-        exit 0
-        ;;
-    init) # initialize the '~/.dotfiles' repository
+case "$1" in
+install) # install 'dotfiles' in $2 or /usr/local/bin
+    cd "$HOME"
+    cp -v ".dotfiles.sh" "${2:-/usr/local/bin}/dotfiles" && chmod +x "${2:-/usr/local/bin}/dotfiles"
+    exit $?
+    ;;
+init) # initialize the '~/.dotfiles' repository
+    if test ! -d "$GIT_DIR"; then
         mkdir -p "$GIT_DIR"
         git init --bare "$GIT_DIR"
         git symbolic-ref HEAD "refs/heads/$DOTFILES_BRANCH"
         git config --local status.showUntrackedFiles no
         exit 0
-        ;;
-    help)
-        ;;
-    *)
+    else
+        echo "already initialized" 1>&2
+        exit 1
+    fi
+    ;;
+help)
+    ;;
+*)
+    if test ! -d "$GIT_DIR"; then
         echo "not initialized" 1>&2
-        exit 0
-        ;;
-    esac
-fi
+        exit 1
+    fi
+    ;;
+esac
 
 export GIT_WORK_TREE="${DOTFILES_HOME:-$HOME}"
 
@@ -52,10 +55,9 @@ help|'') # show this help
 
   dotfiles -- manage your dotfiles in git
 
-This file should reside as .dotfiles.sh somewhere (in /root or some
-trusted users home).  That makes it possible to revision itself. An
-user can then install a symlink from a directory in PATH to this file
-to make it accessible for execution.
+This file should reside as ~/.dotfiles.sh.  That makes it possible
+to revision and upgrade itself. An user can then install to
+'/usr/local/bin' or any other directory.
 
 After that the 'init' command sets up '~/.dotfiles' as bare git
 repository where configuration files will be stored. There will be no
@@ -97,7 +99,7 @@ CONFIGURATION
 EXAMPLES SETUP
 
   install as /usr/local/bin/dotfiles
-    sh ~/.dotfiles.sh install
+    bash ~/.dotfiles.sh install
 
   initialize dotfiles once before use
     dotfiles init
@@ -138,12 +140,14 @@ EXAMPLES USAGE
     dotfiles status
     dotfiles diff
 
+
 EXAMPLE UPGRADE FROM UPSTREAM
 
   Updates dotfiles from the upstream/orignal repository
     dotfiles remote add upstream git://git.pipapo.org/dotfiles
     echo 'DOTFILES_UPGRADE="upstream/master"' >>.dotfilesrc
     dotfiles upgrade
+
 
 LICENSE
 
@@ -191,19 +195,21 @@ stored: ${files[*]}"
     push_git &
     ;;
 upgrade) # upgrade dotfiles itself
-    if [[ ! "$(dotfiles ls-files -m "$DOTFILES")" && "$DOTFILES_UPGRADE" ]]; then
+    cd "$HOME"
+    if [[ ! "$(dotfiles ls-files -m ".dotfiles.sh")" && "$DOTFILES_UPGRADE" ]]; then
         git remote update "${DOTFILES_UPGRADE%%/*}"
-        git checkout "$DOTFILES_UPGRADE" -- "$DOTFILES" 2>/dev/null
-        if [[ "$(dotfiles ls-files -m "$DOTFILES")" ]]; then
-            git add -- "$DOTFILES"
-            git commit -m "$DOTFILES upgrade"
+        git checkout "$DOTFILES_UPGRADE" -- ".dotfiles.sh" 2>/dev/null
+
+        if [[ "$(dotfiles ls-files -m ".dotfiles.sh")" ]]; then
+            git add -- ".dotfiles.sh"
+            git commit -m ".dotfiles.sh upgrade"
             push_git &
-        fi
+            cp -v ".dotfiles.sh" "$0" && chmod +x "${0}" || {
+                echo "upgrade failed" 1>&2
+                exit 1
+            }
+       fi
     fi
-    ;;
-init)
-    echo "$GIT_DIR exists already"
-    exit 1
     ;;
 *)
     git "$@"
