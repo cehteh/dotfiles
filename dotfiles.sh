@@ -54,7 +54,7 @@ function push_git()
 {
     if [[ "$DOTFILES_PUSH" ]]; then
 	for remote in $DOTFILES_PUSH; do
-	    git push "$remote" &>/dev/null
+	    git push "$remote" &>/dev/null &
 	done
     fi
 }
@@ -195,8 +195,9 @@ autocommit) # do an automatic commit saving all pending changes (for cron)
     git commit -a -m "autocommit:
 
 $(git status -s)"
-    push_git &
+    push_git
     ;;
+
 store) # add and commit files in one go (any non-file argument becomes the commit message)
     shift
     files=()
@@ -212,8 +213,9 @@ store) # add and commit files in one go (any non-file argument becomes the commi
     git add -- "${files[@]}"
     git commit -m "${msg}
 stored: ${files[*]}"
-    push_git &
+    push_git
     ;;
+
 upgrade) # upgrade dotfiles itself
     cd "$HOME"
     if [[ ! "$(dotfiles ls-files -m ".dotfiles.sh")" && "$DOTFILES_UPGRADE" ]]; then
@@ -231,9 +233,10 @@ upgrade) # upgrade dotfiles itself
        fi
     fi
     ;;
+
 *)
     git "$@"
-    push_git &
+    push_git
     ;;
 esac
 
