@@ -1,6 +1,10 @@
 #!/bin/bash
 
-test -f "$HOME/.dotfilesrc" && source "$HOME/.dotfilesrc"
+#PLANNED: ignore file list for autocommit
+#PLANNED: rewrite history to include only current files
+#PLANNED: prune history since some time in the past
+
+test -f "$HOME/.dotfilesrc" && . "$HOME/.dotfilesrc"
 
 export GIT_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 export DOTFILES_BRANCH="${DOTFILES_BRANCH:-$(whoami)@$(hostname)}"
@@ -37,8 +41,10 @@ init) # initialize the '~/.dotfiles' repository
         exit 1
     fi
     ;;
+
 help)
     ;;
+
 *)
     if test ! -d "$GIT_DIR"; then
         echo "not initialized" 1>&2
@@ -59,7 +65,9 @@ function push_git()
     fi
 }
 
+
 case "$1" in
+
 help|'') # show this help
     if test "$2"; then
         shift
@@ -88,12 +96,13 @@ convinience but otherwise all normal git commands are available.
 
 COMMANDS
 
-$(sed 's/ *\([[:alpha:]]*\)[^)]*) *# \(.*\)/  \1\n     \2\n/p;d' < "$0")
+$(sed 's/ *\([[:alpha:]]*\)[^)]*) *# \(.*\)/  \1\n     \2\n/p;d' < "$DOTFILES")
 
 CONFIGURATION
 
   The user can configure variables in '~/.dotfilesrc'. When this file
-  does not exist or variables are not defined, defaults apply.
+  does not exist or variables are not defined, defaults apply. This
+  configuration should be done before calling 'dotfiles init'.
 
   DOTFILES_DIR="\$HOME/.dotfiles"
     The directory where 'dotfiles' will create the local repository
@@ -190,6 +199,7 @@ LICENSE
 EOF
     fi
     ;;
+
 autocommit) # do an automatic commit saving all pending changes (for cron)
     shift
     git commit -a -m "autocommit:
@@ -225,9 +235,9 @@ upgrade) # upgrade dotfiles itself
         if [[ "$(dotfiles ls-files -m ".dotfiles.sh")" ]]; then
             git add -- ".dotfiles.sh"
             git commit -m ".dotfiles.sh upgrade"
-            push_git &
-            cp -v ".dotfiles.sh" "$0" && chmod +x "${0}" || {
-                echo "upgrade failed" 1>&2
+            push_git
+            cp -v ".dotfiles.sh" "$DOTFILES" && chmod +x "$DOTFILES" || {
+                echo "upgrade-install failed" 1>&2
                 exit 1
             }
        fi
