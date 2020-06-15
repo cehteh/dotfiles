@@ -1,10 +1,9 @@
 
   dotfiles -- manage your dotfiles in git
 
-This file should reside as .dotfiles.sh somewhere (in /root or some
-trusted users home).  That makes it possible to revision itself. An
-user can then install a symlink from a directory in PATH to this file
-to make it accessible for execution.
+This file should reside as ~/.dotfiles.sh.  That makes it possible
+to revision and upgrade itself. An user can then install to
+'/usr/local/bin' or any other directory.
 
 After that the 'init' command sets up '~/.dotfiles' as bare git
 repository where configuration files will be stored. There will be no
@@ -22,7 +21,7 @@ convinience but otherwise all normal git commands are available.
 COMMANDS
 
   install
-     install a 'dotfiles' symlink to this script in $2 or /usr/local/bin
+     install 'dotfiles' to ~/.dotfiles.sh and then to $2 or /usr/local/bin
 
   init
      initialize the '~/.dotfiles' repository
@@ -42,7 +41,8 @@ COMMANDS
 CONFIGURATION
 
   The user can configure variables in '~/.dotfilesrc'. When this file
-  does not exist or variables are not defined, defaults apply.
+  does not exist or variables are not defined, defaults apply. This
+  configuration should be done before calling 'dotfiles init'.
 
   DOTFILES_DIR="$HOME/.dotfiles"
     The directory where 'dotfiles' will create the local repository
@@ -59,10 +59,16 @@ CONFIGURATION
   DOTFILES_UPGRADE
     remote/branch specification from where to update 'dotfiles' itself
 
+
 EXAMPLES SETUP
 
-  install as /usr/local/bin/dotfiles
-    sh ~/.dotfiles.sh install
+  install from git (upstream) as /usr/local/bin/dotfiles
+    git clone --sparse git://git.pipapo.org/dotfiles
+    cd dotfiles
+    bash dotfiles.sh install
+
+  (re-)install as /usr/local/bin/dotfiles
+    bash ~/.dotfiles.sh install
 
   initialize dotfiles once before use
     dotfiles init
@@ -103,12 +109,14 @@ EXAMPLES USAGE
     dotfiles status
     dotfiles diff
 
+
 EXAMPLE UPGRADE FROM UPSTREAM
 
   Updates dotfiles from the upstream/orignal repository
     dotfiles remote add upstream git://git.pipapo.org/dotfiles
     echo 'DOTFILES_UPGRADE="upstream/master"' >>.dotfilesrc
     dotfiles upgrade
+
 
 LICENSE
 
