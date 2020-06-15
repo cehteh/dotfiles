@@ -4,19 +4,33 @@ test -f "$HOME/.dotfilesrc" && source "$HOME/.dotfilesrc"
 
 export GIT_DIR="${DOTFILES_DIR:-$HOME/.dotfiles}"
 export DOTFILES_BRANCH="${DOTFILES_BRANCH:-$(whoami)@$(hostname)}"
+export DOTFILES="$(realpath $0)"
 
 case "$1" in
-install) # install 'dotfiles' in $2 or /usr/local/bin
-    cd "$HOME"
-    cp -v ".dotfiles.sh" "${2:-/usr/local/bin}/dotfiles" && chmod +x "${2:-/usr/local/bin}/dotfiles"
+
+install) # install 'dotfiles' to ~/.dotfiles.sh and then to $2 or /usr/local/bin
+    # first case: install from git
+    DOTFILES_PATH="${DOTFILES%/*}"
+    if test -f "${DOTFILES_PATH}/.DOTFILES_DISTRIBUTION"; then
+        cp -v "$DOTFILES" "$HOME/.dotfiles.sh" && chmod +x "$HOME/.dotfiles.sh"
+    fi
+
+    # and then to the given folder
+    cp -v "$DOTFILES" "${2:-/usr/local/bin}/dotfiles" && chmod +x "${2:-/usr/local/bin}/dotfiles"
     exit $?
     ;;
+
 init) # initialize the '~/.dotfiles' repository
     if test ! -d "$GIT_DIR"; then
         mkdir -p "$GIT_DIR"
         git init --bare "$GIT_DIR"
         git symbolic-ref HEAD "refs/heads/$DOTFILES_BRANCH"
         git config --local status.showUntrackedFiles no
+
+        if test -f ".dotfiles.sh"; then
+            git add ".dotfiles.sh"
+        fi
+
         exit 0
     else
         echo "already initialized" 1>&2
@@ -96,9 +110,15 @@ CONFIGURATION
   DOTFILES_UPGRADE
     remote/branch specification from where to update 'dotfiles' itself
 
+
 EXAMPLES SETUP
 
-  install as /usr/local/bin/dotfiles
+  install from git (upstream) as /usr/local/bin/dotfiles
+    git clone --sparse git://git.pipapo.org/dotfiles
+    cd dotfiles
+    bash dotfiles.sh install
+
+  (re-)install as /usr/local/bin/dotfiles
     bash ~/.dotfiles.sh install
 
   initialize dotfiles once before use
@@ -198,7 +218,7 @@ upgrade) # upgrade dotfiles itself
     cd "$HOME"
     if [[ ! "$(dotfiles ls-files -m ".dotfiles.sh")" && "$DOTFILES_UPGRADE" ]]; then
         git remote update "${DOTFILES_UPGRADE%%/*}"
-        git checkout "$DOTFILES_UPGRADE" -- ".dotfiles.sh" 2>/dev/null
+        git show "${DOTFILES_UPGRADE}:dotfiles.sh" >".dotfiles.sh"
 
         if [[ "$(dotfiles ls-files -m ".dotfiles.sh")" ]]; then
             git add -- ".dotfiles.sh"
