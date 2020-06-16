@@ -16,7 +16,7 @@ If existing the '~/.dotfilesrc' file can be used to customize certain
 aspects (see CONFIGURATION below).
 
 dotfiles is a very thin layer over 'git' it adds a few commands for
-convinience but otherwise all normal git commands are available.
+convenience but otherwise all normal git commands are available.
 
 COMMANDS
 
@@ -51,7 +51,7 @@ CONFIGURATION
     Git branch name for local commits.
 
   DOTFILES_HOME="$HOME"
-    The toplevel directory to be tracked.
+    The top-level directory to be tracked.
 
   DOTFILES_PUSH
     A list of remotes where to push automatically after storing changes.
@@ -91,7 +91,7 @@ EXAMPLES SETUP
     echo ".gnupg/** filter=git-crypt diff=git-crypt" >>.gitattributes
     dotfiles store .gitattributes
 
-  Confirm git-crypot is working
+  Confirm git-crypt is working
     dotfiles check-attr -a -- .ssh/*
 
 
@@ -112,7 +112,7 @@ EXAMPLES USAGE
 
 EXAMPLE UPGRADE FROM UPSTREAM
 
-  Updates dotfiles from the upstream/orignal repository
+  Updates dotfiles from the upstream/original repository
     dotfiles remote add upstream git://git.pipapo.org/dotfiles
     echo 'DOTFILES_UPGRADE="upstream/master"' >>.dotfilesrc
     dotfiles upgrade
