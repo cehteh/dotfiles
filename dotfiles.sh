@@ -194,6 +194,11 @@ CONTRIBUTING
 
   All content is in 'dotfiles.sh'.
 
+  consider following as .git/hooks/pre-commit:
+    #!/bin/sh
+    bash dotfiles.sh > README
+    git add README
+
 
 LICENSE
 
