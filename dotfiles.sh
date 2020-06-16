@@ -178,6 +178,14 @@ EXAMPLE UPGRADE FROM UPSTREAM
     dotfiles upgrade
 
 
+HIDDEN FEATURES
+
+  * 'dotfiles' can also manage regular files, despite it's name
+
+  Untested:
+  * It may work with git-annex and git-lfs and other git extensions
+
+
 CONTRIBUTING
 
   This is an open project, fork it, hack it, send patches!
