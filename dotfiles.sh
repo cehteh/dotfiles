@@ -256,16 +256,18 @@ upgrade) # upgrade dotfiles itself
     cd "$HOME"
     if [[ ! "$(dotfiles ls-files -m ".dotfiles.sh")" && "$DOTFILES_UPGRADE" ]]; then
         git remote update "${DOTFILES_UPGRADE%%/*}"
-        git show "${DOTFILES_UPGRADE}:dotfiles.sh" >".dotfiles.sh"
+        git show "${DOTFILES_UPGRADE}:dotfiles.sh" >".dotfiles.sh$$"
+        rm ".dotfiles.sh" && mv -v ".dotfiles.sh$$" ".dotfiles.sh"
 
         if [[ "$(dotfiles ls-files -m ".dotfiles.sh")" ]]; then
             git add -- ".dotfiles.sh"
             git commit -m ".dotfiles.sh upgrade"
             push_git
-            cp -v ".dotfiles.sh" "$DOTFILES" && chmod +x "$DOTFILES" || {
-                echo "upgrade-install failed" 1>&2
-                exit 1
-            }
+            cp -v ".dotfiles.sh" "$DOTFILES$$" && chmod +x "$DOTFILES$$" || {
+                    echo "upgrade-install failed" 1>&2
+                    exit 1
+                }
+            rm "$DOTFILES" && mv -v "$DOTFILES$$" "$DOTFILES"
        fi
     fi
     ;;
