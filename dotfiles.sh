@@ -20,7 +20,8 @@ install) # install 'dotfiles' to ~/.dotfiles.sh and then to $2 or /usr/local/bin
     fi
 
     # and then to the given folder
-    cp -v "$DOTFILES" "${2:-/usr/local/bin}/dotfiles" && chmod +x "${2:-/usr/local/bin}/dotfiles"
+    test "$DOTFILES" != "${2:-/usr/local/bin}/dotfiles" &&
+        cp -v "$DOTFILES" "${2:-/usr/local/bin}/dotfiles" && chmod +x "${2:-/usr/local/bin}/dotfiles"
     exit $?
     ;;
 
