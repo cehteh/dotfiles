@@ -35,8 +35,12 @@ COMMANDS
   store
      add and commit files in one go (any non-file argument becomes the commit message)
 
+  inventory
+     list all files ever manged in dotfiles
+
   upgrade
      upgrade dotfiles itself
+
 
 CONFIGURATION
 

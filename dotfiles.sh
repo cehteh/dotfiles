@@ -248,6 +248,10 @@ stored: ${files[*]}"
     push_git
     ;;
 
+inventory) # list all files ever manged in dotfiles
+    git log --pretty=format: --name-only --diff-filter=A | sort -u
+    ;;
+
 upgrade) # upgrade dotfiles itself
     cd "$HOME"
     if [[ ! "$(dotfiles ls-files -m ".dotfiles.sh")" && "$DOTFILES_UPGRADE" ]]; then
