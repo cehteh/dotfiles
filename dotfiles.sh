@@ -43,6 +43,11 @@ init) # initialize the '~/.dotfiles' repository
     fi
     ;;
 
+clean|merge|pull|reset)
+    echo "dangerous git command" 1>&2
+    exit 1
+    ;;
+
 help)
     ;;
 
@@ -93,11 +98,13 @@ If existing the '~/.dotfilesrc' file can be used to customize certain
 aspects (see CONFIGURATION below).
 
 dotfiles is a very thin layer over 'git' it adds a few commands for
-convenience but otherwise all normal git commands are available.
+convenience but otherwise most git commands are available. Few git
+commands are refined or disabled for safety reasons.
 
 COMMANDS
 
 $(sed 's/ *\([[:alpha:]]*\)[^)]*) *# \(.*\)/  \1\n     \2\n/p;d' < "$DOTFILES")
+
 
 CONFIGURATION
 
@@ -169,6 +176,21 @@ EXAMPLES USAGE
   show git status/changes
     dotfiles status
     dotfiles diff
+
+  Danger Zone (may destroy user data!)
+    dotfiles force reset --hard
+
+
+EXAMLES WORKFLOW
+
+  Dotfiles allows one to keep the local history of configuration
+  changes and undo them.
+
+  Registering remotes allows to share these configurations, but for
+  safety reasons pulling and merging is disabled in 'dotfiles' (git
+  may inadvertly overwrite untracked but valuable files). Instead one
+  would want to use checkout for single files and using that to merge
+  on a per-file base, commit these when done.
 
 
 EXAMPLE UPGRADE FROM UPSTREAM
@@ -271,6 +293,11 @@ upgrade) # upgrade dotfiles itself
             rm "$DOTFILES" && mv "$DOTFILES$$" "$DOTFILES"
        fi
     fi
+    ;;
+
+force)  # force a git command thats otherwise disabled or refined
+    shift
+    git "$@"
     ;;
 
 *)
