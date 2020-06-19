@@ -16,12 +16,12 @@ install) # install 'dotfiles' to ~/.dotfiles.sh and then to $2 or /usr/local/bin
     # first case: install from git
     DOTFILES_PATH="${DOTFILES%/*}"
     if test -f "${DOTFILES_PATH}/.DOTFILES_DISTRIBUTION"; then
-        cp "$DOTFILES" "$HOME/.dotfiles.sh" && chmod +x "$HOME/.dotfiles.sh"
+        cp -v "$DOTFILES" "$HOME/.dotfiles.sh" && chmod +x "$HOME/.dotfiles.sh"
     fi
 
     # and then to the given folder
     test "$DOTFILES" != "${2:-/usr/local/bin}/dotfiles" &&
-        cp "$DOTFILES" "${2:-/usr/local/bin}/dotfiles" && chmod +x "${2:-/usr/local/bin}/dotfiles"
+        cp -v "$DOTFILES" "${2:-/usr/local/bin}/dotfiles" && chmod +x "${2:-/usr/local/bin}/dotfiles"
     exit $?
     ;;
 
@@ -280,7 +280,7 @@ upgrade) # upgrade dotfiles itself
     if [[ ! "$(dotfiles ls-files -m ".dotfiles.sh")" && "$DOTFILES_UPGRADE" ]]; then
         git remote update "${DOTFILES_UPGRADE%%/*}"
         git show "${DOTFILES_UPGRADE}:dotfiles.sh" >".dotfiles.sh$$"
-        rm ".dotfiles.sh" && mv ".dotfiles.sh$$" ".dotfiles.sh"
+        rm ".dotfiles.sh" && mv ".dotfiles.sh$$" ".dotfiles.sh" && echo ".dotfiles.sh installed" 1>&2
 
         if [[ "$(dotfiles ls-files -m ".dotfiles.sh")" ]]; then
             git add -- ".dotfiles.sh"
@@ -290,7 +290,7 @@ upgrade) # upgrade dotfiles itself
                     echo "upgrade-install failed" 1>&2
                     exit 1
                 }
-            rm "$DOTFILES" && mv "$DOTFILES$$" "$DOTFILES"
+            rm "$DOTFILES" && mv "$DOTFILES$$" "$DOTFILES" && echo ".dotfiles.sh installed" 1>&2
        fi
     fi
     ;;
